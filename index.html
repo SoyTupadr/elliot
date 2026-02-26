@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elliot 💙</title>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<style>
+body{
+  margin:0;
+  background:linear-gradient(180deg,#0f2027,#203a43,#2c5364);
+  font-family:'Segoe UI',sans-serif;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.chat{
+  width:95%;
+  max-width:420px;
+  height:92vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+
+.messages{
+  overflow-y:auto;
+  padding:15px;
+}
+
+.bubble{
+  background:rgba(255,255,255,0.08);
+  padding:14px;
+  border-radius:18px;
+  margin-bottom:12px;
+  animation:fade 0.4s ease;
+  line-height:1.4;
+}
+
+.user{
+  background:rgba(255,105,180,0.25);
+  align-self:flex-end;
+}
+
+input{
+  padding:16px;
+  border-radius:25px;
+  border:none;
+  width:100%;
+  outline:none;
+  font-size:1rem;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+</style>
+</head>
+<body>
+
+<div class="chat">
+  <div class="messages" id="messages"></div>
+  <input type="text" id="input" placeholder="Escribe y presiona Enter...">
+</div>
+
+<script>
+
+// 🔑 PON TU PUBLIC KEY AQUÍ
+emailjs.init("-u8txeRdHTrd0Wxdx");
+
+const questions = [
+
+"Hola… soy Elliot.\nNo estoy aquí para juzgarte.\nEstoy aquí porque a veces dos personas se aman… pero no se entienden.\n\nPrimero… cuando estás pasando un momento difícil, ¿qué necesitas exactamente de él?",
+
+"Cuando él se aleja o guarda silencio… ¿qué historia empieza a formarse en tu cabeza?",
+
+"¿Te has sentido sola estando con él?",
+
+"Cuando te pones cortante… ¿es enojo… o es una forma de protegerte porque algo dolió?",
+
+"Si él pudiera mejorar una sola cosa para que te sintieras apoyada… ¿qué sería?",
+
+"¿Qué es lo que más miedo te da perder de esta relación?",
+
+"Última pregunta… ¿todavía quieres que él sea tu lugar seguro?"
+];
+
+let current = 0;
+let responses = [];
+
+const messages = document.getElementById("messages");
+const input = document.getElementById("input");
+
+function addMessage(text, sender="bot"){
+  const div = document.createElement("div");
+  div.classList.add("bubble");
+  if(sender==="user") div.classList.add("user");
+  div.innerText = text;
+  messages.appendChild(div);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function askQuestion(){
+  if(current < questions.length){
+    setTimeout(()=>{
+      addMessage(questions[current]);
+    },700);
+  } else {
+    sendEmail();
+  }
+}
+
+input.addEventListener("keydown",function(e){
+  if(e.key==="Enter" && input.value.trim()!==""){
+    addMessage(input.value,"user");
+
+    responses.push({
+      question: questions[current],
+      answer: input.value
+    });
+
+    input.value="";
+    current++;
+
+    addMessage("Elliot está pensando...");
+
+    setTimeout(()=>{
+      messages.removeChild(messages.lastChild);
+      askQuestion();
+    },1000);
+  }
+});
+
+function sendEmail(){
+
+  addMessage("Gracias por responder con honestidad… Estoy analizando tus palabras con cuidado 💙");
+
+  let formatted = "";
+  responses.forEach((r,i)=>{
+    formatted += `Pregunta ${i+1}:\n${r.question}\n\nRespuesta:\n${r.answer}\n\n------------------------\n\n`;
+  });
+
+  emailjs.send("service_c7ld18n","template_60p82ic",{
+    title: "Respuestas Sistema Elliot",
+    name: "Ella",
+    message: formatted,
+    email: "no-reply@elliot.com"
+  })
+  .then(()=>{
+    addMessage("Listo… A veces entender es el primer paso para sanar.");
+    input.style.display="none";
+  })
+  .catch((error)=>{
+    addMessage("Hubo un pequeño error al enviar…");
+    console.log(error);
+  });
+}
+
+askQuestion();
+
+</script>
+
+</body>
+</html>
