@@ -2,146 +2,333 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Elliot 💙</title>
 
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <style>
+
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
-  background:linear-gradient(180deg,#0f2027,#203a43,#2c5364);
   font-family:'Segoe UI',sans-serif;
-  color:white;
+  background:linear-gradient(135deg,#1f1c2c,#928dab);
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
+  height:100dvh;
+  overflow:hidden;
 }
 
-.chat{
-  width:95%;
-  max-width:420px;
-  height:92vh;
+.chat-container{
+  width:100%;
+  max-width:600px;
+  height:95vh;
+  backdrop-filter:blur(20px);
+  background:rgba(255,255,255,0.08);
+  border-radius:25px;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
+  overflow:hidden;
+  box-shadow:0 20px 40px rgba(0,0,0,0.4);
+}
+
+.header{
+  padding:18px;
+  text-align:center;
+  font-weight:600;
+  letter-spacing:1px;
+  background:rgba(255,255,255,0.1);
+  color:white;
 }
 
 .messages{
+  flex:1;
   overflow-y:auto;
-  padding:15px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
 }
 
 .bubble{
-  background:rgba(255,255,255,0.08);
-  padding:14px;
-  border-radius:18px;
-  margin-bottom:12px;
-  animation:fade 0.4s ease;
-  line-height:1.4;
+  padding:14px 18px;
+  border-radius:20px;
+  margin-bottom:14px;
+  max-width:85%;
+  line-height:1.5;
+  animation:fade .3s ease;
+  white-space:pre-wrap;
+}
+
+.bot{
+  background:rgba(255,255,255,0.15);
+  color:white;
+  align-self:flex-start;
 }
 
 .user{
-  background:rgba(255,105,180,0.25);
+  background:linear-gradient(135deg,#812121,#812121);
+  color:white;
   align-self:flex-end;
 }
 
+.input-area{
+  display:flex;
+  padding:15px;
+  background:rgba(0,0,0,0.2);
+  gap:10px;
+}
+
 input{
-  padding:16px;
-  border-radius:25px;
+  flex:1;
+  padding:14px;
   border:none;
-  width:100%;
+  border-radius:25px;
   outline:none;
   font-size:1rem;
+}
+
+button{
+  padding:14px 20px;
+  border:none;
+  border-radius:25px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover{
+  opacity:0.85;
+}
+
+.confirm-box{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  visibility:hidden;
+  opacity:0;
+  transition:0.3s;
+}
+
+.confirm-box.active{
+  visibility:visible;
+  opacity:1;
+}
+
+.confirm-content{
+  background:white;
+  padding:25px;
+  border-radius:20px;
+  width:90%;
+  max-width:400px;
+  text-align:center;
+}
+
+.confirm-content p{
+  margin-bottom:20px;
+  color:#333;
+}
+
+.confirm-buttons{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.confirm-buttons button{
+  flex:1;
+  border-radius:12px;
 }
 
 @keyframes fade{
   from{opacity:0;transform:translateY(10px)}
   to{opacity:1;transform:translateY(0)}
 }
+
 </style>
 </head>
 <body>
 
-<div class="chat">
+<div class="chat-container">
+  <div class="header">Elliot E&Y</div>
   <div class="messages" id="messages"></div>
-  <input type="text" id="input" placeholder="Escribe y presiona Enter...">
+  <div class="input-area">
+    <input type="text" id="input" placeholder="Escribe tu respuesta...">
+    <button id="sendBtn">Enviar</button>
+  </div>
+</div>
+
+<div class="confirm-box" id="confirmBox">
+  <div class="confirm-content">
+    <p>¿Enviar esta respuesta?</p>
+    <div class="confirm-buttons">
+      <button onclick="confirmSend()">Sí, enviar</button>
+      <button onclick="cancelSend()">Cancelar</button>
+    </div>
+  </div>
 </div>
 
 <script>
 
-// 🔑 PON TU PUBLIC KEY AQUÍ
 emailjs.init("-u8txeRdHTrd0Wxdx");
 
 const questions = [
+`Hola de nuevo.
+Soy Elliot.
 
-"Hola… soy Elliot una IA desarrollada por mi creador liam, todas tus respuestas seran procesadas por mi y dichas de tal forma que ambos se entiendan, cabe aclarar que las preguntas fueron formuladas por mi en base a mi conocimiento del tema.\nNo estoy aquí para juzgar, estoy aqui para comprender.\ny porque a veces dos personas se aman… pero no se entienden.\n\nPrimero… cuando estás pasando un momento difícil, ¿qué necesitas exactamente de él?",
+Mi base de conocimiento ha sido actualizada y estoy listo para continuar.
 
-"Cuando él se aleja o guarda silencio… ¿qué historia empieza a formarse en tu cabeza y como te hace sentir?",
+Quiero comprenderte mejor, así que intentemos responder con la mayor claridad posible.
+Las respuestas específicas me ayudan a interpretar con mayor precisión lo que sientes.
 
-"¿Te has sentido sola estando con él?",
+Gracias por seguir aquí.., empecemos:
 
-"Cuando hay silencio… ¿es enojo… o es una forma de protegerte porque algo dolió?",
+Cuando alguien te importa de verdad,
+¿qué cosas pequeñas hacen que lo notes sin que te lo digan?`,
 
-"Si él pudiera mejorar una sola cosa para que te sintieras apoyada… ¿qué sería?",
+`En los momentos donde te sientes vulnerable,
+¿qué actitud te transmite tranquilidad inmediata?`,
 
-"¿Qué es lo que más miedo te da perder de esta relación?",
-  
-  "¿Describe algunas de tus citas perfectas o almenos indicios para hacercelo saber a mi Amo?",
+`¿Qué diferencia para ti a alguien que solo está presente
+de alguien que realmente se involucra?`,
 
-"Última pregunta… ¿Quieres que él sea tu lugar seguro?"
+`Si una relación empieza a volverse fría,
+¿en qué señales lo notas primero?`,
+
+`¿Qué tipo de esfuerzo te parece romántico
+aunque nadie más lo vea como algo grande?`,
+
+`Cuando alguien planea algo para ti,
+¿qué detalle hace que sientas que fue pensado específicamente para ti?`,
+
+`¿Qué te hace sentir elegida y no solo acompañada?`,
+
+`¿Qué conversación pendiente crees que muchas parejas evitan
+pero en realidad lo cambia todo?`,
+
+`Cuando discutes con alguien que amas,
+¿qué gesto reduce tu enojo casi de inmediato?`,
+
+`¿Qué significa para ti construir algo serio con alguien?`,
+
+`¿Qué cosas te hacen sentir que estás creciendo dentro de una relación?`,
+
+`Si pudieras describir la energía ideal de tu pareja,
+¿cómo sería?`,
+
+`¿Qué tipo de conexión te hace pensar
+“aquí quiero quedarme”?`,
+
+`Cuando piensas en perder el tiempo con alguien,
+¿cómo se ve esa situación?`,
+
+`¿Qué haría que confiar se sintiera natural
+y no un esfuerzo constante?`,
+
+`¿Hay algo que valoras mucho
+pero casi nunca pides directamente?`,
+
+`¿Qué tipo de liderazgo en una relación te atrae más:
+el que guía sin preguntar,
+o el que construye contigo cada decisión?`,
+
+`Si alguien quisiera sorprenderte emocionalmente,
+¿qué tendría que entender primero sobre ti?`
 ];
 
 let current = 0;
 let responses = [];
+let pendingMessage = "";
 
 const messages = document.getElementById("messages");
 const input = document.getElementById("input");
+const confirmBox = document.getElementById("confirmBox");
 
 function addMessage(text, sender="bot"){
   const div = document.createElement("div");
   div.classList.add("bubble");
-  if(sender==="user") div.classList.add("user");
+  div.classList.add(sender === "user" ? "user" : "bot");
   div.innerText = text;
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
+  return div;
+}
+
+function typeMessage(text, callback){
+  const bubble = addMessage("", "bot");
+  let i = 0;
+  const typing = setInterval(()=>{
+    bubble.innerText += text.charAt(i);
+    messages.scrollTop = messages.scrollHeight;
+    i++;
+    if(i >= text.length){
+      clearInterval(typing);
+      if(callback) callback();
+    }
+  },18);
 }
 
 function askQuestion(){
-  if(current < questions.length){
-    setTimeout(()=>{
-      addMessage(questions[current]);
-    },700);
-  } else {
+
+  if(current >= questions.length){
     sendEmail();
+    return;
   }
+
+  // Si es la primera pregunta, no mostrar "pensando"
+  if(current === 0){
+    typeMessage(questions[current]);
+    return;
+  }
+
+  const delay = Math.floor(Math.random() * 2000) + 2000;
+
+  const thinking = addMessage("Elliot está escribiendo...");
+  setTimeout(()=>{
+    messages.removeChild(thinking);
+    typeMessage(questions[current]);
+  },delay);
 }
 
-input.addEventListener("keydown",function(e){
-  if(e.key==="Enter" && input.value.trim()!==""){
-    addMessage(input.value,"user");
-
-    responses.push({
-      question: questions[current],
-      answer: input.value
-    });
-
-    input.value="";
-    current++;
-
-    addMessage("Elliot está pensando...");
-
-    setTimeout(()=>{
-      messages.removeChild(messages.lastChild);
-      askQuestion();
-    },1000);
-  }
+document.getElementById("sendBtn").addEventListener("click", ()=>{
+  if(input.value.trim() === "") return;
+  pendingMessage = input.value;
+  confirmBox.classList.add("active");
 });
+
+function confirmSend(){
+  confirmBox.classList.remove("active");
+
+  addMessage(pendingMessage,"user");
+
+  responses.push({
+    question: questions[current],
+    answer: pendingMessage
+  });
+
+  input.value="";
+  pendingMessage="";
+  current++;
+
+  askQuestion();
+}
+
+function cancelSend(){
+  confirmBox.classList.remove("active");
+}
 
 function sendEmail(){
 
-  addMessage("Gracias por responder con honestidad… Estoy analizando tus palabras con cuidado 💙");
+  typeMessage("Gracias por abrir tu corazón… Estoy analizando cada palabra 💙");
 
   let formatted = "";
   responses.forEach((r,i)=>{
@@ -155,16 +342,18 @@ function sendEmail(){
     email: "no-reply@elliot.com"
   })
   .then(()=>{
-    addMessage("Listo… A veces entender es el primer paso para sanar.");
-    input.style.display="none";
-  })
-  .catch((error)=>{
-    addMessage("Hubo un pequeño error al enviar…");
-    console.log(error);
+    setTimeout(()=>{
+      typeMessage("Todo ha sido enviado…");
+      document.querySelector(".input-area").style.display="none";
+    },2000);
   });
 }
-
-askQuestion();
+typeMessage("Bienvenido.\nMe alegra que estés aquí.\n\nTomaré un momento para organizar mis parámetros de análisis...", () => {
+  setTimeout(()=>{
+    askQuestion();
+  },1500);
+});
+//askQuestion();
 
 </script>
 
